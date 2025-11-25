@@ -57,6 +57,24 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        urgency: {
+          1: "hsl(var(--urgency-1))",
+          2: "hsl(var(--urgency-2))",
+          3: "hsl(var(--urgency-3))",
+          4: "hsl(var(--urgency-4))",
+          5: "hsl(var(--urgency-5))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+      },
+      fontFamily: {
+        sans: ['"Noto Sans Thai"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
