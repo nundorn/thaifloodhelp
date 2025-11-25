@@ -36,8 +36,16 @@ const Input = () => {
         throw new Error(data.error);
       }
 
-      // Navigate to review page with extracted data
-      navigate('/review', { state: { extractedData: data } });
+      // Check if multiple reports were extracted
+      if (data.reports && data.reports.length > 1) {
+        // Navigate to selection page
+        navigate('/select', { state: { reports: data.reports } });
+      } else if (data.reports && data.reports.length === 1) {
+        // Single report - go directly to review
+        navigate('/review', { state: { extractedData: data.reports[0] } });
+      } else {
+        throw new Error('ไม่พบข้อมูลที่สามารถแยกได้');
+      }
     } catch (err) {
       console.error('Processing error:', err);
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการประมวลผล');
