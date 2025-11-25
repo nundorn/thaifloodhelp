@@ -21,7 +21,6 @@ import {
   UserRound,
   Filter,
   Loader2,
-  MessageSquare,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -50,7 +49,6 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState<number | null>(null);
-  const [showQueryBot, setShowQueryBot] = useState(false);
 
   useEffect(() => {
     fetchReports();
@@ -135,23 +133,12 @@ const Dashboard = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             กลับไปหน้าแรก
           </Button>
-          
-          <Button 
-            onClick={() => setShowQueryBot(!showQueryBot)}
-            variant="outline"
-            className="gap-2"
-          >
-            <MessageSquare className="h-4 w-4" />
-            {showQueryBot ? 'ซ่อน' : 'แสดง'} Query Bot
-          </Button>
         </div>
 
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">ข้อมูลผู้ประสบภัยทั้งหมด</p>
         </div>
-
-        {showQueryBot && <QueryBot />}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -288,6 +275,8 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+      
+      <QueryBot />
     </div>
   );
 };

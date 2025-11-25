@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Send } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2, Send, MessageSquare, X, Minimize2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface QueryResult {
-  summary: string;
-  count: number;
-  reports: Array<{
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  reports?: Array<{
     id: string;
     name: string;
     lastname: string;
@@ -21,38 +22,42 @@ interface QueryResult {
 }
 
 const QueryBot = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [query, setQuery] = useState("");
   const [isQuerying, setIsQuerying] = useState(false);
-  const [result, setResult] = useState<QueryResult | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleQuery = async () => {
-    if (!query.trim()) {
-      toast.error('กรุณาระบุคำถาม');
-      return;
-    }
+    if (!query.trim()) return;
 
+    const userMessage: Message = { role: 'user', content: query.trim() };
+    setMessages(prev => [...prev, userMessage]);
+    setQuery("");
     setIsQuerying(true);
-    setResult(null);
 
     try {
       const { data, error } = await supabase.functions.invoke('query-reports', {
-        body: { query: query.trim() }
+        body: { query: userMessage.content }
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setResult(data);
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: data.summary,
+        reports: data.reports
+      };
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (err) {
       console.error('Query error:', err);
-      toast.error('ไม่สามารถค้นหาได้', {
-        description: err instanceof Error ? err.message : 'กรุณาลองใหม่อีกครั้ง'
-      });
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'ขอโทษครับ ไม่สามารถประมวลผลคำถามได้ กรุณาลองใหม่อีกครั้ง'
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      toast.error('เกิดข้อผิดพลาด');
     } finally {
       setIsQuerying(false);
     }
@@ -69,77 +74,127 @@ const QueryBot = () => {
     return `urgency-badge-${level}`;
   };
 
+  if (!isOpen) {
+    return (
+      <Button
+        onClick={() => setIsOpen(true)}
+        size="lg"
+        className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg z-50"
+      >
+        <MessageSquare className="h-6 w-6" />
+      </Button>
+    );
+  }
+
   return (
-    <Card className="shadow-lg border-accent/30">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-accent">
-          <span>Query Bot</span>
-          <Badge variant="outline" className="text-xs">AI-Powered</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder='ถามอะไรก็ได้ เช่น "มีเด็กต่ำกว่า 1 ขวบกี่เคส" หรือ "พื้นที่ใดต้องการเรือด่วน"'
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isQuerying}
-            className="flex-1"
-          />
-          <Button onClick={handleQuery} disabled={isQuerying || !query.trim()}>
-            {isQuerying ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
+    <Card className={`fixed right-6 z-50 shadow-2xl border-2 transition-all duration-300 ${
+      isMinimized 
+        ? 'bottom-6 w-80' 
+        : 'bottom-6 w-96 h-[600px]'
+    }`}>
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          <span className="font-semibold">Query Bot</span>
+          <Badge variant="secondary" className="text-xs">AI</Badge>
+        </div>
+        <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            onClick={() => setIsMinimized(!isMinimized)}
+          >
+            <Minimize2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            onClick={() => setIsOpen(false)}
+          >
+            <X className="h-4 w-4" />
           </Button>
         </div>
+      </div>
 
-        {result && (
-          <div className="space-y-4">
-            <div className="p-4 bg-accent/10 rounded-lg">
-              <p className="text-sm font-medium mb-2">คำตอบ:</p>
-              <p className="text-foreground">{result.summary}</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                พบข้อมูลทั้งหมด {result.count} รายการ
-              </p>
-            </div>
-
-            {result.reports.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">รายการที่เกี่ยวข้อง:</p>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {result.reports.map((report) => (
-                    <Card key={report.id} className="p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium truncate">
-                              {report.name} {report.lastname}
-                            </p>
-                            <Badge className={getUrgencyBadgeClass(report.urgency_level)}>
-                              {report.urgency_level}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {report.address}
-                          </p>
-                          {report.help_needed && (
-                            <p className="text-sm text-primary mt-1">
-                              ต้องการ: {report.help_needed}
-                            </p>
-                          )}
+      {!isMinimized && (
+        <>
+          {/* Messages */}
+          <ScrollArea className="flex-1 p-4 h-[440px]">
+            {messages.length === 0 ? (
+              <div className="text-center text-muted-foreground py-12">
+                <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p className="text-sm">ถามคำถามเกี่ยวกับข้อมูลผู้ประสบภัย</p>
+                <p className="text-xs mt-2">เช่น "มีเด็กต่ำกว่า 1 ขวบกี่เคส"</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[80%] rounded-lg p-3 ${
+                      msg.role === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted'
+                    }`}>
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      
+                      {msg.reports && msg.reports.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          {msg.reports.slice(0, 3).map((report) => (
+                            <div key={report.id} className="bg-background/50 rounded p-2 text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{report.name} {report.lastname}</span>
+                                <Badge className={getUrgencyBadgeClass(report.urgency_level)} variant="outline">
+                                  {report.urgency_level}
+                                </Badge>
+                              </div>
+                              <p className="text-muted-foreground truncate mt-1">{report.address}</p>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {isQuerying && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted rounded-lg p-3">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
+          </ScrollArea>
+
+          {/* Input */}
+          <div className="p-4 border-t bg-background">
+            <div className="flex gap-2">
+              <Input
+                placeholder="พิมพ์คำถามของคุณ..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isQuerying}
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleQuery} 
+                disabled={isQuerying || !query.trim()}
+                size="icon"
+              >
+                {isQuerying ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
-        )}
-      </CardContent>
+        </>
+      )}
     </Card>
   );
 };
