@@ -147,34 +147,42 @@ serve(async (req) => {
     const data = await response.json();
     console.log('AI Response:', JSON.stringify(data));
 
-    // Extract function call result
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall || !toolCall.function) {
+    // Extract all function calls (multiple reports from one message)
+    const toolCalls = data.choices?.[0]?.message?.tool_calls;
+    if (!toolCalls || toolCalls.length === 0) {
       throw new Error('No function call in AI response');
     }
 
-    const extractedData = JSON.parse(toolCall.function.arguments);
-    
-    // Add raw_message to the result
-    const result = {
-      ...extractedData,
-      raw_message: rawMessage,
-      // Set defaults for optional fields
-      lastname: extractedData.lastname || '',
-      location_lat: extractedData.location_lat || '',
-      location_long: extractedData.location_long || '',
-      phone: extractedData.phone || [],
-      number_of_adults: extractedData.number_of_adults || 0,
-      number_of_children: extractedData.number_of_children || 0,
-      number_of_seniors: extractedData.number_of_seniors || 0,
-      health_condition: extractedData.health_condition || '',
-      help_needed: extractedData.help_needed || '',
-    };
+    // Process all extracted reports
+    const extractedReports = toolCalls.map((toolCall: any) => {
+      const extractedData = JSON.parse(toolCall.function.arguments);
+      
+      return {
+        ...extractedData,
+        raw_message: rawMessage,
+        // Set defaults for optional fields
+        lastname: extractedData.lastname || '',
+        location_lat: extractedData.location_lat || '',
+        location_long: extractedData.location_long || '',
+        phone: extractedData.phone || [],
+        number_of_adults: extractedData.number_of_adults || 0,
+        number_of_children: extractedData.number_of_children || 0,
+        number_of_seniors: extractedData.number_of_seniors || 0,
+        health_condition: extractedData.health_condition || '',
+        help_needed: extractedData.help_needed || '',
+        name: extractedData.name || '',
+        address: extractedData.address || '',
+        urgency_level: extractedData.urgency_level || 1,
+      };
+    });
 
-    console.log('Extracted data:', result);
+    console.log('Extracted reports:', extractedReports);
 
     return new Response(
-      JSON.stringify(result),
+      JSON.stringify({ 
+        reports: extractedReports,
+        count: extractedReports.length 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

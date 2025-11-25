@@ -31,18 +31,29 @@ const Review = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ExtractedData | null>(null);
+  const [reports, setReports] = useState<ExtractedData[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [phoneInput, setPhoneInput] = useState("");
 
   useEffect(() => {
     const extractedData = location.state?.extractedData;
-    if (!extractedData) {
+    const extractedReports = location.state?.reports;
+    
+    if (extractedReports && extractedReports.length > 0) {
+      // Multiple reports mode
+      setReports(extractedReports);
+      setFormData(extractedReports[0]);
+      setPhoneInput(extractedReports[0].phone?.join(', ') || '');
+    } else if (extractedData) {
+      // Single report mode
+      setReports([extractedData]);
+      setFormData(extractedData);
+      setPhoneInput(extractedData.phone?.join(', ') || '');
+    } else {
       toast.error('ไม่พบข้อมูล', { description: 'กรุณากรอกข้อมูลใหม่' });
       navigate('/');
-      return;
     }
-    setFormData(extractedData);
-    setPhoneInput(extractedData.phone?.join(', ') || '');
   }, [location, navigate]);
 
   const handleSave = async () => {
@@ -70,11 +81,24 @@ const Review = () => {
         throw error;
       }
 
-      toast.success('บันทึกข้อมูลสำเร็จ!', {
-        description: 'ข้อมูลถูกเพิ่มเข้าระบบเรียบร้อยแล้ว'
-      });
-
-      navigate('/dashboard');
+      // Check if there are more reports to review
+      if (currentIndex < reports.length - 1) {
+        // Move to next report
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+        setFormData(reports[nextIndex]);
+        setPhoneInput(reports[nextIndex].phone?.join(', ') || '');
+        
+        toast.success(`บันทึกรายการที่ ${currentIndex + 1} สำเร็จ!`, {
+          description: `เหลืออีก ${reports.length - nextIndex} รายการ`
+        });
+      } else {
+        // All done
+        toast.success('บันทึกข้อมูลทั้งหมดสำเร็จ!', {
+          description: `บันทึกทั้งหมด ${reports.length} รายการเรียบร้อย`
+        });
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error('Save error:', err);
       toast.error('ไม่สามารถบันทึกได้', {
@@ -129,7 +153,14 @@ const Review = () => {
           <Card className="shadow-lg">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl">ข้อมูลที่แยกได้</CardTitle>
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-2xl">ข้อมูลที่แยกได้</CardTitle>
+                  {reports.length > 1 && (
+                    <Badge variant="outline" className="text-sm">
+                      รายการที่ {currentIndex + 1}/{reports.length}
+                    </Badge>
+                  )}
+                </div>
                 <Badge className={urgencyColors[formData.urgency_level - 1]}>
                   เร่งด่วนระดับ {formData.urgency_level}
                 </Badge>
