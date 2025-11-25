@@ -526,6 +526,7 @@ const Dashboard = () => {
                         </div>
                       </TableHead>
                       <TableHead>ชื่อ-นามสกุล</TableHead>
+                      <TableHead className="text-center">แผนที่</TableHead>
                       <TableHead>ที่อยู่</TableHead>
                       <TableHead>เบอร์โทร</TableHead>
                       <TableHead
@@ -609,21 +610,23 @@ const Dashboard = () => {
                               </Badge>
                             </TableCell>
                             <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                {report.name} {report.lastname}
-                                {report.map_link && (
-                                  <a 
-                                    href={report.map_link} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:text-primary/80"
-                                    onClick={(e) => e.stopPropagation()}
-                                    title="เปิด Google Maps"
-                                  >
-                                    🗺️
-                                  </a>
-                                )}
-                              </div>
+                              {report.name} {report.lastname}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {report.map_link ? (
+                                <a 
+                                  href={report.map_link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center justify-center text-2xl hover:scale-110 transition-transform"
+                                  onClick={(e) => e.stopPropagation()}
+                                  title="เปิด Google Maps"
+                                >
+                                  🗺️
+                                </a>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">-</span>
+                              )}
                             </TableCell>
                             <TableCell className="max-w-[150px] truncate">{report.address}</TableCell>
                             <TableCell className="whitespace-nowrap">
@@ -640,7 +643,7 @@ const Dashboard = () => {
                           </TableRow>
                           {isExpanded && (
                             <TableRow key={`${report.id}-expanded`}>
-                              <TableCell colSpan={11} className="bg-muted/30 p-6">
+                              <TableCell colSpan={12} className="bg-muted/30 p-6">
                                 <div className="space-y-4">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
