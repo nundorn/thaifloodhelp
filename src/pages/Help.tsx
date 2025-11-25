@@ -293,7 +293,7 @@ const Help = () => {
               หากพบปัญหาหรือต้องการสอบถามข้อมูลเพิ่มเติม กรุณาติดต่อ:
             </p>
             <div className="flex flex-col gap-2">
-              <Button variant="outline" onClick={() => window.open('https://github.com/yourusername/thaifloodhelp/issues', '_blank')}>
+              <Button variant="outline" onClick={() => window.open('https://github.com/winn/thaifloodhelp/issues', '_blank')}>
                 <ArrowRight className="mr-2 h-4 w-4" />
                 รายงานปัญหาบน GitHub
               </Button>
