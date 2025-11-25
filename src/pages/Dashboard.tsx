@@ -186,26 +186,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchReports();
-
-    // Subscribe to realtime updates
-    const channel = supabase
-      .channel('reports-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'reports'
-        },
-        () => {
-          fetchReports();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
 
   useEffect(() => {
