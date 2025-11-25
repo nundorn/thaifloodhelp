@@ -54,6 +54,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState<number | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     fetchReports();
@@ -80,28 +81,53 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    let filtered = reports;
+    const searchReports = async () => {
+      if (!searchTerm.trim()) {
+        // No search term - show all reports with urgency filter
+        let filtered = reports;
+        if (urgencyFilter !== null) {
+          filtered = filtered.filter((r) => r.urgency_level === urgencyFilter);
+        }
+        setFilteredReports(filtered);
+        return;
+      }
 
-    if (searchTerm) {
-      const lowerSearch = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (r) =>
-          r.name?.toLowerCase().includes(lowerSearch) ||
-          r.lastname?.toLowerCase().includes(lowerSearch) ||
-          r.address?.toLowerCase().includes(lowerSearch) ||
-          r.reporter_name?.toLowerCase().includes(lowerSearch) ||
-          r.phone?.some(p => p.includes(searchTerm)) ||
-          r.health_condition?.toLowerCase().includes(lowerSearch) ||
-          r.help_needed?.toLowerCase().includes(lowerSearch) ||
-          r.additional_info?.toLowerCase().includes(lowerSearch)
-      );
-    }
+      // Perform vector-based semantic search
+      setIsSearching(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('search-reports', {
+          body: { 
+            query: searchTerm,
+            urgencyFilter: urgencyFilter,
+            limit: 100
+          }
+        });
 
-    if (urgencyFilter !== null) {
-      filtered = filtered.filter((r) => r.urgency_level === urgencyFilter);
-    }
+        if (error) throw error;
 
-    setFilteredReports(filtered);
+        setFilteredReports(data.reports || []);
+      } catch (err) {
+        console.error('Search error:', err);
+        toast.error('ไม่สามารถค้นหาได้', {
+          description: 'กรุณาลองใหม่อีกครั้ง'
+        });
+        // Fallback to showing all reports
+        let filtered = reports;
+        if (urgencyFilter !== null) {
+          filtered = filtered.filter((r) => r.urgency_level === urgencyFilter);
+        }
+        setFilteredReports(filtered);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    // Debounce search
+    const timeoutId = setTimeout(() => {
+      searchReports();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [reports, searchTerm, urgencyFilter]);
 
   const fetchReports = async () => {
@@ -197,12 +223,17 @@ const Dashboard = () => {
         <Card>
           <CardHeader>
             <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
+              <div className="flex-1 relative">
                 <Input
-                  placeholder="ค้นหา: ชื่อ, ที่อยู่, เบอร์โทร, ความช่วยเหลือ..."
+                  placeholder="ค้นหาอัจฉริยะ: ชื่อ, ที่อยู่, เบอร์โทร, อาการ, ความช่วยเหลือ... (ใช้ AI)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  </div>
+                )}
               </div>
               <div className="flex gap-2 flex-wrap">
                 <Button

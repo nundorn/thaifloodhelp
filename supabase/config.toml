@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.check-duplicates]
 verify_jwt = false
+
+[functions.search-reports]
+verify_jwt = false
