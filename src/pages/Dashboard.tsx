@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import {
   AlertCircle,
@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QueryBot from "@/components/QueryBot";
 import { Checkbox } from "@/components/ui/checkbox";
+import ReportHeatmap from "@/components/ReportHeatmap";
 
 interface Report {
   id: string;
@@ -95,19 +96,19 @@ const Dashboard = () => {
       if (!searchTerm.trim()) {
         // No search term - show all reports with filters
         let filtered = reports;
-        
+
         // Apply urgency filter
         if (urgencyFilter !== null) {
           filtered = filtered.filter((r) => r.urgency_level === urgencyFilter);
         }
-        
+
         // Apply help category filters
         if (selectedCategories.length > 0) {
-          filtered = filtered.filter((r) => 
+          filtered = filtered.filter((r) =>
             selectedCategories.some(cat => r.help_categories?.includes(cat))
           );
         }
-        
+
         setFilteredReports(filtered);
         return;
       }
@@ -116,7 +117,7 @@ const Dashboard = () => {
       setIsSearching(true);
       try {
         const { data, error } = await supabase.functions.invoke('search-reports', {
-          body: { 
+          body: {
             query: searchTerm,
             urgencyFilter: urgencyFilter,
             limit: 100,
@@ -127,10 +128,10 @@ const Dashboard = () => {
         if (error) throw error;
 
         let searchResults = data.reports || [];
-        
+
         // Apply help category filters to search results
         if (selectedCategories.length > 0) {
-          searchResults = searchResults.filter((r: Report) => 
+          searchResults = searchResults.filter((r: Report) =>
             selectedCategories.some(cat => r.help_categories?.includes(cat))
           );
         }
@@ -147,7 +148,7 @@ const Dashboard = () => {
           filtered = filtered.filter((r) => r.urgency_level === urgencyFilter);
         }
         if (selectedCategories.length > 0) {
-          filtered = filtered.filter((r) => 
+          filtered = filtered.filter((r) =>
             selectedCategories.some(cat => r.help_categories?.includes(cat))
           );
         }
@@ -291,7 +292,7 @@ const Dashboard = () => {
                   🔍 Deep Search (AI)
                 </Button>
               </div>
-              
+
               {/* Urgency Filter */}
               <div className="space-y-2">
                 <div className="text-sm font-medium">ระดับความเร่งด่วน</div>
@@ -338,11 +339,10 @@ const Dashboard = () => {
                   ].map((category) => (
                     <div
                       key={category.id}
-                      className={`flex items-center space-x-2 p-2 rounded-md border cursor-pointer transition-colors ${
-                        selectedCategories.includes(category.id)
+                      className={`flex items-center space-x-2 p-2 rounded-md border cursor-pointer transition-colors ${selectedCategories.includes(category.id)
                           ? 'bg-primary/10 border-primary'
                           : 'bg-muted/30 border-border hover:bg-muted/50'
-                      }`}
+                        }`}
                       onClick={() => {
                         setSelectedCategories((prev) =>
                           prev.includes(category.id)
@@ -353,7 +353,7 @@ const Dashboard = () => {
                     >
                       <Checkbox
                         checked={selectedCategories.includes(category.id)}
-                        onCheckedChange={() => {}}
+                        onCheckedChange={() => { }}
                       />
                       <span className="text-sm flex items-center gap-1">
                         <span>{category.icon}</span>
@@ -366,6 +366,9 @@ const Dashboard = () => {
             </div>
           </CardHeader>
         </Card>
+
+        {/* Heatmap */}
+        <ReportHeatmap reports={filteredReports} />
 
         {/* Table */}
         <Card>
@@ -401,8 +404,8 @@ const Dashboard = () => {
                       const isExpanded = expandedRows.has(report.id);
                       return (
                         <>
-                          <TableRow 
-                            key={report.id} 
+                          <TableRow
+                            key={report.id}
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => toggleRowExpansion(report.id)}
                           >
@@ -503,7 +506,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <QueryBot />
     </div>
   );
