@@ -71,13 +71,22 @@ const Review = () => {
         .map(p => p.trim())
         .filter(p => p.length > 0);
 
+      // Validate and parse last_contact_at - only accept valid datetime format
+      let validLastContact = null;
+      if (formData.last_contact_at && formData.last_contact_at.trim()) {
+        const parsed = new Date(formData.last_contact_at);
+        if (!isNaN(parsed.getTime())) {
+          validLastContact = formData.last_contact_at;
+        }
+      }
+
       const dataToSave = {
         ...formData,
         name: formData.name && formData.name !== '-' ? formData.name : 'ไม่ระบุชื่อ',
         phone: phones,
         location_lat: formData.location_lat ? parseFloat(formData.location_lat) : null,
         location_long: formData.location_long ? parseFloat(formData.location_long) : null,
-        last_contact_at: formData.last_contact_at || null,
+        last_contact_at: validLastContact,
       };
 
       const { error } = await supabase.from('reports').insert([dataToSave]);
