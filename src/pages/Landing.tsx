@@ -34,27 +34,22 @@ const Landing = () => {
 
   const loadStats = async () => {
     try {
-      const { count: totalCount } = await supabase
-        .from('reports')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: helpedCount } = await supabase
-        .from('reports')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'completed');
-
-      const { count: urgentCount } = await supabase
-        .from('reports')
-        .select('*', { count: 'exact', head: true })
-        .gte('urgency_level', 4);
+      // Run queries in parallel for better performance
+      const [totalResult, helpedResult, urgentResult] = await Promise.all([
+        supabase.from('reports').select('*', { count: 'exact', head: true }),
+        supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+        supabase.from('reports').select('*', { count: 'exact', head: true }).gte('urgency_level', 4)
+      ]);
 
       setStats({
-        totalReports: totalCount || 0,
-        helpedCount: helpedCount || 0,
-        urgentCount: urgentCount || 0
+        totalReports: totalResult.count || 0,
+        helpedCount: helpedResult.count || 0,
+        urgentCount: urgentResult.count || 0
       });
     } catch (error) {
       console.error('Error loading stats:', error);
+      // Keep current stats or show 0 - don't crash the page
+      setStats({ totalReports: 0, helpedCount: 0, urgentCount: 0 });
     }
   };
 
