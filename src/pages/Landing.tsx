@@ -94,7 +94,7 @@ const Landing = () => {
           >
             Thai Flood Help
             <br />
-            <span className="text-white/90 text-2xl sm:text-3xl md:text-4xl lg:text-6xl block mt-2">
+            <span className="text-white/90 text-lg sm:text-xl md:text-2xl lg:text-4xl block mt-2">
               รวมข้อมูลที่กระจัดกระจาย ใน Social Media และช่องทางต่างๆ
             </span>
           </motion.h1>
