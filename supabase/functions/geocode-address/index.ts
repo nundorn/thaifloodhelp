@@ -23,32 +23,79 @@ serve(async (req) => {
     // Sanitize and prepare address for geocoding
     const cleanedAddress = address.trim();
     
-    // Use Nominatim (OpenStreetMap) for geocoding - free and no API key required
-    // Add Thailand bias and Thai language support
-    const encodedAddress = encodeURIComponent(cleanedAddress);
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&limit=3&countrycodes=th&accept-language=th`;
-    
     console.log('Geocoding address:', cleanedAddress);
-    
-    const response = await fetch(nominatimUrl, {
-      headers: {
-        'User-Agent': 'ThaiFloodHelp/1.0 (Disaster Relief Application)',
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error(`Nominatim API error: ${response.status}`);
+    // Helper function to try geocoding
+    const tryGeocode = async (searchAddress: string) => {
+      const encodedAddress = encodeURIComponent(searchAddress);
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&limit=3&countrycodes=th&accept-language=th`;
+      
+      const response = await fetch(nominatimUrl, {
+        headers: {
+          'User-Agent': 'ThaiFloodHelp/1.0 (Disaster Relief Application)',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Nominatim API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data && data.length > 0 ? data[0] : null;
+    };
+
+    // Strategy 1: Try exact address
+    let result = await tryGeocode(cleanedAddress);
+
+    // Strategy 2: If no results and address contains formal terms (ตำบล, อำเภอ, จังหวัด), 
+    // try simplified version without postal code
+    if (!result && /\d{5}/.test(cleanedAddress)) {
+      const withoutPostal = cleanedAddress.replace(/\s*\d{5}\s*$/, '');
+      console.log('Trying without postal code:', withoutPostal);
+      result = await tryGeocode(withoutPostal);
     }
 
-    const data = await response.json();
+    // Strategy 3: Try replacing formal terms with abbreviations
+    if (!result) {
+      const abbreviated = cleanedAddress
+        .replace(/ตำบล/g, 'ต.')
+        .replace(/อำเภอ/g, 'อ.')
+        .replace(/จังหวัด/g, 'จ.')
+        .replace(/ถนน/g, 'ถ.')
+        .replace(/\s*\d{5}\s*$/, ''); // Also remove postal code
+      
+      if (abbreviated !== cleanedAddress) {
+        console.log('Trying abbreviated:', abbreviated);
+        result = await tryGeocode(abbreviated);
+      }
+    }
 
-    if (data && data.length > 0) {
-      // Take the first result (highest confidence)
-      const result = data[0];
+    // Strategy 4: Extract street/road + district/city only
+    if (!result) {
+      const streetMatch = cleanedAddress.match(/^[\d\/\-]+\s*(?:ถ\.|ถนน)?\s*([^\s]+)/);
+      const districtMatch = cleanedAddress.match(/(?:อ\.|อำเภอ)([^\s]+)/);
+      
+      if (streetMatch && districtMatch) {
+        const simplified = `${streetMatch[0]} อ.${districtMatch[1]}`;
+        console.log('Trying street + district:', simplified);
+        result = await tryGeocode(simplified);
+      }
+    }
+
+    // Strategy 5: Try just district/city name
+    if (!result) {
+      const cityMatch = cleanedAddress.match(/(?:อ\.|อำเภอ|ต\.|ตำบล)([^\s]+)/);
+      if (cityMatch) {
+        const cityOnly = cityMatch[0].replace(/ตำบล|อำเภอ/, '').replace(/^(อ\.|ต\.)/, '') + ' ' + cityMatch[1];
+        console.log('Trying city only:', cityOnly);
+        result = await tryGeocode(cityOnly);
+      }
+    }
+
+    // If we found a result from any strategy
+    if (result) {
       const lat = parseFloat(result.lat);
       const lng = parseFloat(result.lon);
-
-      // Generate Google Maps link
       const mapLink = `https://maps.google.com/?q=${lat},${lng}`;
 
       console.log('Geocoding successful:', { lat, lng, mapLink });
@@ -63,42 +110,6 @@ serve(async (req) => {
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    }
-
-    // If no results, try with just the city/district name as fallback
-    const cityMatch = cleanedAddress.match(/(อ\.|จ\.|ต\.)([^\s]+)/);
-    if (cityMatch) {
-      const simplifiedAddress = cityMatch[0] + ' ' + cityMatch[2];
-      const simplifiedUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(simplifiedAddress)}&format=json&limit=1&countrycodes=th`;
-      
-      const fallbackResponse = await fetch(simplifiedUrl, {
-        headers: {
-          'User-Agent': 'ThaiFloodHelp/1.0 (Disaster Relief Application)',
-        },
-      });
-
-      if (fallbackResponse.ok) {
-        const fallbackData = await fallbackResponse.json();
-        if (fallbackData && fallbackData.length > 0) {
-          const result = fallbackData[0];
-          const lat = parseFloat(result.lat);
-          const lng = parseFloat(result.lon);
-          const mapLink = `https://maps.google.com/?q=${lat},${lng}`;
-
-          console.log('Geocoding successful with fallback:', { lat, lng, mapLink });
-
-          return new Response(
-            JSON.stringify({
-              lat,
-              lng,
-              map_link: mapLink,
-              display_name: result.display_name,
-              success: true
-            }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-      }
     }
 
     console.log('No geocoding results found for address:', cleanedAddress);
