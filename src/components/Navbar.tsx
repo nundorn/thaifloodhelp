@@ -88,7 +88,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 will-change-auto">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
@@ -184,14 +184,14 @@ const Navbar = () => {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px]">
+              <SheetContent side="right" className="w-[280px] overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <img src={logo} alt="Logo" className="h-6 w-6" />
                     เมนู
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-2 mt-8">
+                <div className="flex flex-col gap-2 mt-8 pb-8">
                   {navItems.map((item) => {
                     const Icon = item.icon;
                     const isExternal = 'isExternal' in item && item.isExternal;
