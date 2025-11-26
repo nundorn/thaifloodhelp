@@ -169,25 +169,34 @@ const Landing = () => {
           {/* CTA Buttons */}
           <motion.div 
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col gap-6 justify-center items-center max-w-2xl mx-auto"
           >
-            <Button 
-              size="lg"
-              className="text-lg h-14 px-10 bg-white text-blue-600 hover:bg-white/90 shadow-xl shadow-black/10 font-semibold rounded-xl"
-              onClick={() => navigate('/dashboard')}
-            >
-              <Search className="mr-2 h-5 w-5" />
-              ค้นหาผู้ต้องการความช่วยเหลือ
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              className="text-lg h-14 px-10 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 border-2 border-white/30 shadow-xl font-semibold rounded-xl"
-              onClick={() => navigate('/extraction')}
-            >
-              <MessageSquarePlus className="mr-2 h-5 w-5" />
-              ช่วยใส่ข้อมูลจาก social
-            </Button>
+            {/* Primary CTA - ช่วยใส่ข้อมูล */}
+            <div className="w-full">
+              <Button 
+                size="lg"
+                className="w-full text-xl h-20 px-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-2xl shadow-orange-500/50 font-bold rounded-2xl border-4 border-white/30 transform hover:scale-105 transition-all duration-300"
+                onClick={() => navigate('/extraction')}
+              >
+                <MessageSquarePlus className="mr-3 h-7 w-7" />
+                <div className="flex flex-col items-start">
+                  <span className="text-2xl">ช่วยใส่ข้อมูลจาก Social</span>
+                  <span className="text-sm font-normal opacity-90">คุณสามารถช่วยชีวิตได้ด้วยการใส่ข้อมูล</span>
+                </div>
+              </Button>
+            </div>
+
+            {/* Secondary CTA - ค้นหา */}
+            <div className="w-full flex gap-4">
+              <Button 
+                size="lg"
+                className="flex-1 text-lg h-14 px-8 bg-white text-blue-600 hover:bg-white/90 shadow-xl font-semibold rounded-xl"
+                onClick={() => navigate('/dashboard')}
+              >
+                <Search className="mr-2 h-5 w-5" />
+                ค้นหาผู้ต้องการความช่วยเหลือ
+              </Button>
+            </div>
           </motion.div>
         </motion.div>
       </section>
@@ -423,7 +432,7 @@ const Landing = () => {
               {
                 icon: HeartHandshake,
                 title: "สำหรับอาสาสมัคร",
-                buttonText: "เริ่มช่วยเหลือ",
+                buttonText: "ช่วยใส่ข้อมูล",
                 onClick: () => navigate('/extraction')
               },
               {
@@ -465,24 +474,6 @@ const Landing = () => {
           </div>
         </div>
       </section>
-
-      {/* Emergency Banner */}
-      <div className="fixed bottom-0 left-0 right-0 bg-red-600 text-white py-4 px-4 z-50 shadow-2xl">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-base md:text-lg">
-            <span className="font-semibold">
-              ⚠️ มีเคสเร่งด่วน {stats.urgentCount} เคส รอความช่วยเหลือ
-            </span>
-          </div>
-          <Button 
-            size="lg"
-            className="bg-white text-red-600 hover:bg-gray-100 font-bold h-12 px-8 rounded-lg"
-            onClick={() => navigate('/dashboard')}
-          >
-            ช่วยเหลือเดี๋ยวนี้
-          </Button>
-        </div>
-      </div>
     </div>
   );
 };
