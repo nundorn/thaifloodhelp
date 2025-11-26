@@ -19,9 +19,9 @@ const Navbar = () => {
   const navItems = [
     {
       path: "/extraction",
-      label: "บันทึกข้อมูล",
+      label: "ช่วยใส่ข้อมูล",
       icon: Home,
-      description: "แจ้งข้อมูลผู้ประสบภัย",
+      description: "ช่วยใส่ข้อมูลจาก social",
     },
     {
       path: "/dashboard",

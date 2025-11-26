@@ -186,7 +186,7 @@ const Landing = () => {
               onClick={() => navigate('/extraction')}
             >
               <MessageSquarePlus className="mr-2 h-5 w-5" />
-              แจ้งข้อมูลผู้ต้องการความช่วยเหลือ
+              ช่วยใส่ข้อมูลจาก social
             </Button>
           </motion.div>
         </motion.div>
