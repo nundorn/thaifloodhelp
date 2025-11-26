@@ -79,44 +79,44 @@ const Landing = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section with Background Image */}
-      <section className="relative overflow-hidden py-24 md:py-32 px-4" style={{ backgroundImage: `url(${heroFlood})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <section className="relative overflow-hidden py-12 md:py-16 px-4 min-h-screen flex items-center" style={{ backgroundImage: `url(${heroFlood})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         {/* Black overlay with 50% opacity */}
         <div className="absolute inset-0 bg-black/50" />
         
         <motion.div
-          className="max-w-6xl mx-auto text-center relative z-10"
+          className="max-w-6xl mx-auto text-center relative z-10 w-full"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           <motion.h1 
             variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 md:mb-8 leading-tight px-4"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 leading-tight px-4"
           >
             Thai Flood Help
             <br />
-            <span className="text-white/90 text-lg sm:text-xl md:text-2xl lg:text-4xl block mt-2">
+            <span className="text-white/90 text-base sm:text-lg md:text-xl lg:text-2xl block mt-2">
               รวมข้อมูลที่กระจัดกระจาย ใน Social Media และช่องทางต่างๆ
             </span>
           </motion.h1>
 
           <motion.p 
             variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/95 mb-4 md:mb-6 font-medium px-4"
+            className="text-sm sm:text-base md:text-lg text-white/95 mb-2 md:mb-3 font-medium px-4"
           >
             สกัดข้อมูลสำคัญด้วย AI เพื่อการช่วยเหลือที่รวดเร็วขึ้น
           </motion.p>
 
           <motion.p 
             variants={itemVariants}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/90 mb-3 md:mb-4 font-semibold px-4"
+            className="text-base sm:text-lg md:text-xl text-white/90 mb-2 md:mb-3 font-semibold px-4"
           >
             เมื่อ AI กับมนุษย์ ทำงานร่วมกัน เพื่อช่วยผู้ประสบภัย
           </motion.p>
 
           <motion.p 
             variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl text-white/80 mb-8 md:mb-12 px-4"
+            className="text-sm sm:text-base md:text-lg text-white/80 mb-4 md:mb-6 px-4"
           >
             ทุกวินาที • มีคนรอความช่วยเหลือ
           </motion.p>
@@ -124,17 +124,17 @@ const Landing = () => {
           {/* Technology Badges */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-12 md:mb-16 text-xs sm:text-sm md:text-base px-4"
+            className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-6 md:mb-8 text-xs sm:text-sm px-4"
           >
-            <div className="px-4 sm:px-6 py-2 sm:py-3 bg-white/20 backdrop-blur-md rounded-full text-white font-medium border border-white/30 whitespace-nowrap">
+            <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/20 backdrop-blur-md rounded-full text-white font-medium border border-white/30 whitespace-nowrap">
               🎧 Social Listening
             </div>
-            <div className="text-xl sm:text-2xl text-white/50">+</div>
-            <div className="px-4 sm:px-6 py-2 sm:py-3 bg-white/20 backdrop-blur-md rounded-full text-white font-medium border border-white/30 whitespace-nowrap">
+            <div className="text-lg sm:text-xl text-white/50">+</div>
+            <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/20 backdrop-blur-md rounded-full text-white font-medium border border-white/30 whitespace-nowrap">
               👥 Crowd Sourcing
             </div>
-            <div className="text-xl sm:text-2xl text-white/50">+</div>
-            <div className="px-4 sm:px-6 py-2 sm:py-3 bg-white/20 backdrop-blur-md rounded-full text-white font-medium border border-white/30 whitespace-nowrap">
+            <div className="text-lg sm:text-xl text-white/50">+</div>
+            <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/20 backdrop-blur-md rounded-full text-white font-medium border border-white/30 whitespace-nowrap">
               🤖 AI Technology
             </div>
           </motion.div>
@@ -142,29 +142,29 @@ const Landing = () => {
           {/* Real-time Stats with Glassmorphism */}
           <motion.div 
             variants={itemVariants}
-            className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto mb-8 md:mb-12 px-4"
+            className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 max-w-3xl mx-auto mb-6 md:mb-8 px-4"
           >
-            <div className="bg-white/15 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1 md:mb-2">
+            <div className="bg-white/15 backdrop-blur-lg rounded-lg md:rounded-xl p-3 sm:p-4 md:p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
                 {stats.totalReports}
               </div>
-              <div className="text-xs sm:text-sm md:text-base text-white/80">
+              <div className="text-xs sm:text-sm text-white/80">
                 รายงานในระบบ
               </div>
             </div>
-            <div className="bg-white/15 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1 md:mb-2">
+            <div className="bg-white/15 backdrop-blur-lg rounded-lg md:rounded-xl p-3 sm:p-4 md:p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
                 {stats.helpedCount}
               </div>
-              <div className="text-xs sm:text-sm md:text-base text-white/80">
+              <div className="text-xs sm:text-sm text-white/80">
                 ช่วยเหลือสำเร็จ
               </div>
             </div>
-            <div className="bg-white/15 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1 md:mb-2">
+            <div className="bg-white/15 backdrop-blur-lg rounded-lg md:rounded-xl p-3 sm:p-4 md:p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
                 {stats.urgentCount}
               </div>
-              <div className="text-xs sm:text-sm md:text-base text-white/80">
+              <div className="text-xs sm:text-sm text-white/80">
                 เคสเร่งด่วน
               </div>
             </div>
@@ -173,31 +173,31 @@ const Landing = () => {
           {/* CTA Buttons */}
           <motion.div 
             variants={itemVariants}
-            className="flex flex-col gap-6 justify-center items-center max-w-2xl mx-auto"
+            className="flex flex-col gap-3 md:gap-4 justify-center items-center max-w-2xl mx-auto"
           >
             {/* Primary CTA - ช่วยใส่ข้อมูล */}
             <div className="w-full px-4">
               <Button 
                 size="lg"
-                className="w-full text-base sm:text-lg md:text-xl h-16 sm:h-18 md:h-20 px-6 sm:px-8 md:px-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-2xl shadow-orange-500/50 font-bold rounded-xl md:rounded-2xl border-2 md:border-4 border-white/30 transform hover:scale-105 transition-all duration-300"
+                className="w-full text-sm sm:text-base md:text-lg h-12 sm:h-14 md:h-16 px-4 sm:px-6 md:px-8 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-2xl shadow-orange-500/50 font-bold rounded-lg md:rounded-xl border-2 border-white/30 transform hover:scale-105 transition-all duration-300"
                 onClick={() => navigate('/extraction')}
               >
-                <MessageSquarePlus className="mr-2 sm:mr-3 h-5 sm:h-6 md:h-7 w-5 sm:w-6 md:w-7 flex-shrink-0" />
+                <MessageSquarePlus className="mr-2 h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 flex-shrink-0" />
                 <div className="flex flex-col items-start">
-                  <span className="text-base sm:text-lg md:text-xl lg:text-2xl">ช่วยใส่ข้อมูลจาก Social</span>
-                  <span className="text-xs sm:text-sm font-normal opacity-90 hidden sm:block">คุณสามารถช่วยชีวิตได้ด้วยการใส่ข้อมูล</span>
+                  <span className="text-sm sm:text-base md:text-lg">ช่วยใส่ข้อมูลจาก Social</span>
+                  <span className="text-xs font-normal opacity-90 hidden sm:block">คุณสามารถช่วยชีวิตได้ด้วยการใส่ข้อมูล</span>
                 </div>
               </Button>
             </div>
 
             {/* Secondary CTA - ค้นหา */}
-            <div className="w-full flex gap-4 px-4">
+            <div className="w-full flex gap-3 px-4">
               <Button 
                 size="lg"
-                className="flex-1 text-sm sm:text-base md:text-lg h-12 sm:h-14 px-4 sm:px-6 md:px-8 bg-white text-blue-600 hover:bg-white/90 shadow-xl font-semibold rounded-lg md:rounded-xl"
+                className="flex-1 text-xs sm:text-sm md:text-base h-10 sm:h-12 px-3 sm:px-4 md:px-6 bg-white text-blue-600 hover:bg-white/90 shadow-xl font-semibold rounded-lg"
                 onClick={() => navigate('/dashboard')}
               >
-                <Search className="mr-2 h-4 sm:h-5 w-4 sm:w-5 flex-shrink-0" />
+                <Search className="mr-2 h-4 w-4 flex-shrink-0" />
                 <span className="truncate">ค้นหาผู้ต้องการความช่วยเหลือ</span>
               </Button>
             </div>
