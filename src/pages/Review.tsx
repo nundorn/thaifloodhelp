@@ -129,16 +129,53 @@ const Review = () => {
     setIsCompletingAddress(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('complete-address', {
+      // Step 1: Complete the address with AI
+      const { data: completionData, error: completionError } = await supabase.functions.invoke('complete-address', {
         body: { address: formData.address }
       });
 
-      if (error) throw error;
+      if (completionError) throw completionError;
 
-      if (data.completedAddress) {
-        setFormData({ ...formData, address: data.completedAddress });
+      if (!completionData.completedAddress) {
+        toast.error('ไม่สามารถเติมที่อยู่ได้');
+        return;
+      }
+
+      const completedAddress = completionData.completedAddress;
+      console.log('✓ Completed address:', completedAddress);
+
+      // Step 2: Geocode the completed address
+      const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
+        body: { address: completedAddress }
+      });
+
+      if (geoError) {
+        // Geocoding failed, but we still have the completed address
+        setFormData({ ...formData, address: completedAddress });
         toast.success('เติมที่อยู่สำเร็จ', {
-          description: 'กรุณาตรวจสอบความถูกต้องอีกครั้ง'
+          description: 'แต่ไม่สามารถหาพิกัดได้ กรุณาใส่พิกัดเอง'
+        });
+        return;
+      }
+
+      // Step 3: Update formData with both completed address and coordinates
+      if (geoData?.success && geoData.lat && geoData.lng) {
+        setFormData({
+          ...formData,
+          address: completedAddress,
+          location_lat: String(geoData.lat),
+          location_long: String(geoData.lng),
+          map_link: geoData.map_link
+        });
+        console.log('✓ Geocoded:', geoData.lat, geoData.lng);
+        toast.success('เติมที่อยู่และหาพิกัดสำเร็จ', {
+          description: `พิกัด: ${geoData.lat}, ${geoData.lng}`
+        });
+      } else {
+        // Geocoding didn't succeed, but we have the completed address
+        setFormData({ ...formData, address: completedAddress });
+        toast.success('เติมที่อยู่สำเร็จ', {
+          description: 'แต่ไม่สามารถหาพิกัดได้ กรุณาใส่พิกัดเอง'
         });
       }
     } catch (err) {
