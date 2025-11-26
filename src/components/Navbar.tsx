@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Sheet,
   SheetContent,
@@ -118,8 +119,13 @@ const Navbar = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.user_metadata?.avatar_url || user.user_metadata?.picture} alt={user.email || "User"} />
+                      <AvatarFallback>
+                        {user.email?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -189,9 +195,17 @@ const Navbar = () => {
                   <div className="mt-4 pt-4 border-t">
                     {user ? (
                       <>
-                        <div className="px-4 py-2 text-sm">
-                          <div className="font-medium">{user.email}</div>
-                          {isAdmin && <div className="text-xs text-muted-foreground">Admin</div>}
+                        <div className="px-4 py-2 flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={user.user_metadata?.avatar_url || user.user_metadata?.picture} alt={user.email || "User"} />
+                            <AvatarFallback>
+                              {user.email?.charAt(0).toUpperCase() || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="text-sm">
+                            <div className="font-medium">{user.email}</div>
+                            {isAdmin && <div className="text-xs text-muted-foreground">Admin</div>}
+                          </div>
                         </div>
                         <Button
                           variant="ghost"
