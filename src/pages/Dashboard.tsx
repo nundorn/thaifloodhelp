@@ -578,7 +578,8 @@ const Dashboard = () => {
           </CardHeader>
         </Card>
 
-        <Card>
+        {/* Map section currently disabled due to react-leaflet context error */}
+        {/* <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle>แผนที่ความช่วยเหลือ</CardTitle>
           </CardHeader>
@@ -587,7 +588,7 @@ const Dashboard = () => {
              {filteredReports && <Map reports={reportsWithLocations} />}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="text-sm text-muted-foreground">
