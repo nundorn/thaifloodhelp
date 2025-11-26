@@ -27,6 +27,7 @@ import {
   ChevronLeft,
   Pencil,
   Phone,
+  Share2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -38,8 +39,19 @@ import { EditReportDialog } from "@/components/EditReportDialog";
 import type { Report } from "@/types/report";
 import { formatCaseId, getUrgencyBadgeClass } from "@/lib/reportUtils";
 import { HELP_CATEGORIES } from "@/constants/helpCategories";
+import { useLiff } from "@/contexts/LiffContext";
 
 const Dashboard = () => {
+  const { shareTargetPicker } = useLiff();
+
+  const handleShare = async () => {
+    try {
+      await shareTargetPicker();
+      toast.success('ขอบคุณที่ช่วยแชร์ครับ');
+    } catch (err) {
+      console.error('Share error:', err);
+    }
+  };
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
@@ -338,6 +350,26 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            กลับไปหน้าแรก
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleShare}
+              className="bg-[#06C755] hover:bg-[#05b34c] text-white border-[#06C755] hover:border-[#05b34c]"
+            >
+              <Share2 className="mr-2 h-4 w-4" />
+              แชร์ผ่าน LINE
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/help')}>
+              📖 คู่มือการใช้งาน
+            </Button>
+          </div>
+        </div>
+
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">ข้อมูลผู้ประสบภัยทั้งหมด</p>

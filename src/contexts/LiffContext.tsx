@@ -17,6 +17,8 @@ interface LiffContextType {
   isLoading: boolean;
   login: () => void;
   logout: () => void;
+  shareTargetPicker: () => Promise<void>;
+  isShareAvailable: boolean;
 }
 
 const LiffContext = createContext<LiffContextType | undefined>(undefined);
@@ -93,6 +95,45 @@ export function LiffProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const shareTargetPicker = async () => {
+    if (!isLiffInitialized) {
+      console.warn('LIFF is not initialized');
+      return;
+    }
+
+    if (!liff.isApiAvailable('shareTargetPicker')) {
+      console.warn('ShareTargetPicker is not available');
+      // Fallback: open LINE share URL
+      const shareUrl = 'https://miniapp.line.me/2008569116-rGyQw3mA';
+      const shareText = `ช่วยกันส่งข้อมูลน้ำท่วมผ่าน AI Platform นี้ครับ
+หากพบโพสต์ขอความช่วยเหลือในโซเชียลฯ ฝากนำมากรอกในลิงก์นี้ เพื่อให้ข้อมูลเป็นระบบและช่วยเหลือได้ไวขึ้นครับ
+
+${shareUrl}
+#น้ำท่วม #TechForGood #ThaiFloodHelp #น้ำท่วมไทย`;
+      const lineShareUrl = `https://line.me/R/share?text=${encodeURIComponent(shareText)}`;
+      window.open(lineShareUrl, '_blank');
+      return;
+    }
+
+    try {
+      await liff.shareTargetPicker([
+        {
+          type: 'text',
+          text: `ช่วยกันส่งข้อมูลน้ำท่วมผ่าน AI Platform นี้ครับ
+หากพบโพสต์ขอความช่วยเหลือในโซเชียลฯ ฝากนำมากรอกในลิงก์นี้ เพื่อให้ข้อมูลเป็นระบบและช่วยเหลือได้ไวขึ้นครับ
+
+https://miniapp.line.me/2008569116-rGyQw3mA
+#น้ำท่วม #TechForGood #ThaiFloodHelp #น้ำท่วมไทย`,
+        },
+      ]);
+    } catch (err) {
+      console.error('ShareTargetPicker error:', err);
+      throw err;
+    }
+  };
+
+  const isShareAvailable = isLiffInitialized && (liff.isApiAvailable?.('shareTargetPicker') || true);
+
   return (
     <LiffContext.Provider
       value={{
@@ -104,6 +145,8 @@ export function LiffProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        shareTargetPicker,
+        isShareAvailable,
       }}
     >
       {children}
