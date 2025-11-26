@@ -18,6 +18,7 @@ import {
   HeartHandshake
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import heroFlood from "@/assets/hero-flood.jpg";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -77,10 +78,10 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Gradient */}
-      <section className="relative overflow-hidden py-24 md:py-32 px-4 bg-gradient-to-br from-blue-600 via-purple-500 to-orange-500">
-        {/* Subtle overlay pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.1),transparent_50%)]" />
+      {/* Hero Section with Background Image */}
+      <section className="relative overflow-hidden py-24 md:py-32 px-4" style={{ backgroundImage: `url(${heroFlood})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Black overlay with 50% opacity */}
+        <div className="absolute inset-0 bg-black/50" />
         
         <motion.div
           className="max-w-6xl mx-auto text-center relative z-10"
