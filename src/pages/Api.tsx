@@ -1,25 +1,30 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Send, Copy, Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ApiKeyManager } from "@/components/ApiKeyManager";
 
 const Api = () => {
   const [ocrInput, setOcrInput] = useState("");
   const [ocrResponse, setOcrResponse] = useState("");
   const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrApiKey, setOcrApiKey] = useState("");
   
   const [extractInput, setExtractInput] = useState("");
   const [extractResponse, setExtractResponse] = useState("");
   const [extractLoading, setExtractLoading] = useState(false);
+  const [extractApiKey, setExtractApiKey] = useState("");
   
   const [saveInput, setSaveInput] = useState("");
   const [saveResponse, setSaveResponse] = useState("");
   const [saveLoading, setSaveLoading] = useState(false);
+  const [saveApiKey, setSaveApiKey] = useState("");
   
   const [copiedOcr, setCopiedOcr] = useState(false);
   const [copiedExtract, setCopiedExtract] = useState(false);
@@ -69,6 +74,11 @@ const Api = () => {
       return;
     }
 
+    if (!ocrApiKey.trim()) {
+      toast.error("กรุณาใส่ API Key");
+      return;
+    }
+
     let payload;
     try {
       payload = JSON.parse(ocrInput);
@@ -85,6 +95,7 @@ const Api = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-API-Key": ocrApiKey,
         },
         body: JSON.stringify(payload),
       });
@@ -111,6 +122,11 @@ const Api = () => {
       return;
     }
 
+    if (!extractApiKey.trim()) {
+      toast.error("กรุณาใส่ API Key");
+      return;
+    }
+
     let payload;
     try {
       payload = JSON.parse(extractInput);
@@ -127,6 +143,7 @@ const Api = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-API-Key": extractApiKey,
         },
         body: JSON.stringify(payload),
       });
@@ -153,6 +170,11 @@ const Api = () => {
       return;
     }
 
+    if (!saveApiKey.trim()) {
+      toast.error("กรุณาใส่ API Key");
+      return;
+    }
+
     let payload;
     try {
       payload = JSON.parse(saveInput);
@@ -169,6 +191,7 @@ const Api = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-API-Key": saveApiKey,
         },
         body: JSON.stringify(payload),
       });
@@ -220,9 +243,11 @@ const Api = () => {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            API เหล่านี้เป็นแบบ Public ไม่ต้องใช้ API Key แต่มีการจำกัดอัตราการเรียกใช้งาน
+            การใช้งาน API ต้องเข้าสู่ระบบและมี API Key พร้อมทั้งมีการจำกัดอัตราการเรียกใช้งานตาม Rate Limit ของแต่ละ Key
           </AlertDescription>
         </Alert>
+
+        <ApiKeyManager />
 
         <Card>
           <CardHeader>
@@ -230,7 +255,7 @@ const Api = () => {
             <CardDescription>ใช้ URL พื้นฐานนี้สำหรับเรียก API ทั้งหมด</CardDescription>
           </CardHeader>
           <CardContent>
-            <code className="block bg-muted px-4 py-2 rounded text-sm">
+            <code className="block bg-muted px-4 py-2 rounded text-sm break-all overflow-x-auto">
               {API_BASE_URL}
             </code>
           </CardContent>
@@ -258,7 +283,8 @@ const Api = () => {
                 <div className="space-y-2">
                   <h3 className="font-semibold">Headers</h3>
                   <pre className="bg-muted p-4 rounded text-sm">
-{`Content-Type: application/json`}
+{`Content-Type: application/json
+X-API-Key: your_api_key_here`}
                   </pre>
                 </div>
 
@@ -303,6 +329,16 @@ const Api = () => {
 
                 <div className="space-y-2">
                   <h3 className="font-semibold">ทดสอบ API</h3>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">API Key</label>
+                    <Input
+                      type="password"
+                      placeholder="ใส่ API Key ของคุณ (tfh_...)"
+                      value={ocrApiKey}
+                      onChange={(e) => setOcrApiKey(e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
                   <Textarea
                     placeholder="วาง JSON request body ที่นี่..."
                     value={ocrInput}
@@ -375,7 +411,8 @@ const Api = () => {
                 <div className="space-y-2">
                   <h3 className="font-semibold">Headers</h3>
                   <pre className="bg-muted p-4 rounded text-sm">
-{`Content-Type: application/json`}
+{`Content-Type: application/json
+X-API-Key: your_api_key_here`}
                   </pre>
                 </div>
 
@@ -397,6 +434,16 @@ const Api = () => {
 
                 <div className="space-y-2">
                   <h3 className="font-semibold">ทดสอบ API</h3>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">API Key</label>
+                    <Input
+                      type="password"
+                      placeholder="ใส่ API Key ของคุณ (tfh_...)"
+                      value={extractApiKey}
+                      onChange={(e) => setExtractApiKey(e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
                   <Textarea
                     placeholder="วาง JSON request body ที่นี่..."
                     value={extractInput}
@@ -469,7 +516,8 @@ const Api = () => {
                 <div className="space-y-2">
                   <h3 className="font-semibold">Headers</h3>
                   <pre className="bg-muted p-4 rounded text-sm">
-{`Content-Type: application/json`}
+{`Content-Type: application/json
+X-API-Key: your_api_key_here`}
                   </pre>
                 </div>
 
@@ -491,6 +539,16 @@ const Api = () => {
 
                 <div className="space-y-2">
                   <h3 className="font-semibold">ทดสอบ API</h3>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">API Key</label>
+                    <Input
+                      type="password"
+                      placeholder="ใส่ API Key ของคุณ (tfh_...)"
+                      value={saveApiKey}
+                      onChange={(e) => setSaveApiKey(e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
                   <Textarea
                     placeholder="วาง JSON request body ที่นี่..."
                     value={saveInput}
@@ -555,16 +613,16 @@ const Api = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
-              <div className="flex gap-2">
-                <Badge variant="default">200</Badge>
+              <div className="flex gap-2 items-center">
+                <Badge variant="default" className="min-w-[50px] justify-center">200</Badge>
                 <span>Success - การประมวลผลสำเร็จ</span>
               </div>
-              <div className="flex gap-2">
-                <Badge variant="destructive">400</Badge>
+              <div className="flex gap-2 items-center">
+                <Badge variant="destructive" className="min-w-[50px] justify-center">400</Badge>
                 <span>Bad Request - ข้อมูลที่ส่งมาไม่ถูกต้อง</span>
               </div>
-              <div className="flex gap-2">
-                <Badge variant="destructive">500</Badge>
+              <div className="flex gap-2 items-center">
+                <Badge variant="destructive" className="min-w-[50px] justify-center">500</Badge>
                 <span>Internal Server Error - เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์</span>
               </div>
             </div>

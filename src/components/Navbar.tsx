@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Database, BarChart3, HelpCircle, Menu, X, Code, LogIn, LogOut, User, Target } from "lucide-react";
+import { Home, Database, BarChart3, HelpCircle, Menu, X, Code, LogIn, LogOut, User, Target, Info, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
@@ -61,6 +61,14 @@ const Navbar = () => {
       description: "ทำไมต้อง Thai Flood Help",
     },
     {
+      path: "https://firefly-bridge-frontend.vercel.app/",
+      label: "ศูนย์ประสานงาน",
+      shortLabel: "ศูนย์ฯ",
+      icon: Info,
+      description: "ศูนย์ประสานงานภัยพิบัติ",
+      isExternal: true,
+    },
+    {
       path: "/api",
       label: "API",
       icon: Code,
@@ -80,9 +88,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-2 sm:px-4">
-        <div className="flex h-14 sm:h-16 items-center justify-between gap-1 sm:gap-2">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 will-change-auto">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
           <div
             className="flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0 overflow-hidden"
@@ -99,9 +107,18 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
+              const isExternal = 'isExternal' in item && item.isExternal;
+              const isActive = !isExternal && location.pathname === item.path;
               const isPrimary = 'isPrimary' in item && item.isPrimary;
               const displayLabel = 'shortLabel' in item ? item.shortLabel : item.label;
+
+              const handleClick = () => {
+                if (isExternal) {
+                  window.open(item.path, '_blank', 'noopener,noreferrer');
+                } else {
+                  navigate(item.path);
+                }
+              };
 
               return (
                 <Button
@@ -112,11 +129,12 @@ const Navbar = () => {
                     isActive && "shadow-sm",
                     isPrimary && !isActive && "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold shadow-lg hover:shadow-xl transition-all"
                   )}
-                  onClick={() => navigate(item.path)}
+                  onClick={handleClick}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden lg:inline">{item.label}</span>
                   <span className="lg:hidden">{displayLabel}</span>
+                  {isExternal && <ExternalLink className="h-3 w-3 opacity-50" />}
                 </Button>
               );
             })}
@@ -166,17 +184,27 @@ const Navbar = () => {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px]">
+              <SheetContent side="right" className="w-[280px] overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <img src={logo} alt="Logo" className="h-6 w-6" />
                     เมนู
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-2 mt-8">
+                <div className="flex flex-col gap-2 mt-8 pb-8">
                   {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
+                    const isExternal = 'isExternal' in item && item.isExternal;
+                    const isActive = !isExternal && location.pathname === item.path;
+
+                    const handleClick = () => {
+                      if (isExternal) {
+                        window.open(item.path, '_blank', 'noopener,noreferrer');
+                        setIsOpen(false);
+                      } else {
+                        handleNavigation(item.path);
+                      }
+                    };
 
                     return (
                       <Button
@@ -186,11 +214,14 @@ const Navbar = () => {
                           "justify-start gap-3 h-14 text-base",
                           isActive && "shadow-sm"
                         )}
-                        onClick={() => handleNavigation(item.path)}
+                        onClick={handleClick}
                       >
                         <Icon className="h-5 w-5" />
-                        <div className="flex flex-col items-start">
-                          <span className="font-medium">{item.label}</span>
+                        <div className="flex flex-col items-start flex-1">
+                          <span className="font-medium flex items-center gap-1">
+                            {item.label}
+                            {isExternal && <ExternalLink className="h-3 w-3 opacity-50" />}
+                          </span>
                           <span className="text-xs text-muted-foreground">{item.description}</span>
                         </div>
                       </Button>

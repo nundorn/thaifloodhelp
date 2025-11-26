@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          api_key: string
+          created_at: string | null
+          id: string
+          is_active: boolean
+          last_used_at: string | null
+          name: string
+          rate_limit_per_minute: number
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          name?: string
+          rate_limit_per_minute?: number
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          name?: string
+          rate_limit_per_minute?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      api_usage_logs: {
+        Row: {
+          api_key_id: string
+          called_at: string | null
+          endpoint: string
+          id: string
+          success: boolean
+        }
+        Insert: {
+          api_key_id: string
+          called_at?: string | null
+          endpoint: string
+          id?: string
+          success?: boolean
+        }
+        Update: {
+          api_key_id?: string
+          called_at?: string | null
+          endpoint?: string
+          id?: string
+          success?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_logs_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      line_sessions: {
+        Row: {
+          created_at: string | null
+          id: string
+          message_id: string
+          session_data: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message_id: string
+          session_data: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message_id?: string
+          session_data?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
