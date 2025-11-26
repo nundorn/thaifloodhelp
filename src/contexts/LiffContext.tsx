@@ -25,6 +25,11 @@ const LiffContext = createContext<LiffContextType | undefined>(undefined);
 
 const LIFF_ID = import.meta.env.VITE_LIFF_ID || '';
 
+function mobileCheck(): boolean {
+  const userAgent = navigator.userAgent || '';
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+}
+
 export function LiffProvider({ children }: { children: ReactNode }) {
   const [isLiffInitialized, setIsLiffInitialized] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,17 +47,29 @@ export function LiffProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        await liff.init({ liffId: LIFF_ID });
-        setIsLiffInitialized(true);
-        setIsInLiffClient(liff.isInClient());
-
-        // Check if user is logged in
-        if (liff.isLoggedIn()) {
-          setIsLoggedIn(true);
-          await fetchProfile();
-        } else if (liff.isInClient()) {
-          // Auto login if in LIFF client (LINE app)
-          liff.login();
+        if (liff.isInClient()) {
+          await liff.init({ liffId: LIFF_ID });
+          setIsLiffInitialized(true);
+          setIsInLiffClient(true);
+          if (liff.isLoggedIn()) {
+            setIsLoggedIn(true);
+            await fetchProfile();
+          } else {
+            liff.login();
+          }
+        } else {
+          setIsInLiffClient(false);
+          if (mobileCheck()) {
+            window.location.replace(`line://app/${LIFF_ID}`);
+            setTimeout(() => { window.close(); }, 5000);
+          } else {
+            await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+            setIsLiffInitialized(true);
+            if (liff.isLoggedIn()) {
+              setIsLoggedIn(true);
+              await fetchProfile();
+            }
+          }
         }
       } catch (err) {
         console.error('LIFF initialization failed:', err);
