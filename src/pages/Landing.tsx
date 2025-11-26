@@ -434,7 +434,7 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto px-4">
             {[
               {
                 icon: HeartHandshake,
@@ -462,23 +462,25 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.15 }}
-                className="bg-white/15 backdrop-blur-lg rounded-3xl p-10 border border-white/20 hover:bg-white/25 transition-all duration-300"
+                className="bg-white/15 backdrop-blur-lg rounded-3xl p-8 md:p-10 border border-white/20 hover:bg-white/25 transition-all duration-300 flex flex-col items-center"
               >
-                <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-8">
+                <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-6">
                   <item.icon className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-8 text-center">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-8 text-center min-h-[64px] flex items-center justify-center">
                   {item.title}
                 </h3>
-                <Button 
-                  size="lg"
-                  className="w-full h-auto min-h-12 py-2 px-4 text-sm md:text-base bg-white text-blue-600 hover:bg-white/90 font-semibold rounded-xl shadow-lg flex items-center justify-center"
-                  onClick={item.onClick}
-                >
-                  <span className="whitespace-normal break-words text-center leading-snug max-w-[200px]">
-                    {item.buttonText}
-                  </span>
-                </Button>
+                <div className="mt-auto w-full">
+                  <Button 
+                    size="lg"
+                    className="w-full min-h-[56px] py-3 px-6 text-base md:text-lg bg-white text-blue-600 hover:bg-white/90 font-semibold rounded-xl shadow-lg flex items-center justify-center"
+                    onClick={item.onClick}
+                  >
+                    <span className="whitespace-normal break-words text-center leading-snug">
+                      {item.buttonText}
+                    </span>
+                  </Button>
+                </div>
               </motion.div>
             ))}
           </div>
