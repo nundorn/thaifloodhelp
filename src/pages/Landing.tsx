@@ -88,11 +88,7 @@ const Landing = () => {
           animate="visible"
           variants={containerVariants}
         >
-          <motion.div variants={itemVariants} className="mb-8">
-            <Droplets className="h-16 w-16 md:h-20 md:w-20 text-white mx-auto mb-6 opacity-90" />
-          </motion.div>
-
-          <motion.h1 
+          <motion.h1
             variants={itemVariants}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 md:mb-8 leading-tight px-4"
           >
