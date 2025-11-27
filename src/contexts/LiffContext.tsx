@@ -75,7 +75,7 @@ export function LiffProvider({ children }: { children: ReactNode }) {
           } else {
             await liff.init({
               liffId: LIFF_ID,
-              withLoginOnExternalBrowser: true,
+              withLoginOnExternalBrowser: false,
             })
             setIsLiffInitialized(true)
             if (liff.isLoggedIn()) {
